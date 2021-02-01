@@ -3,16 +3,16 @@ import fetchMock from 'fetch-mock';
 import React from 'react';
 import { StaticRouter } from 'react-router-dom';
 
-import OrgCards, { ORG_TYPE_TRACKER_DEFAULT } from '@/components/tasks/cards';
-import { deleteObject, updateObject } from '@/store/actions';
-import { refetchOrg } from '@/store/orgs/actions';
-import { addUrlParams } from '@/utils/api';
-import { SHOW_PROJECT_COLLABORATORS } from '@/utils/constants';
+import OrgCards, { ORG_TYPE_TRACKER_DEFAULT } from '~js/components/tasks/cards';
+import { deleteObject, updateObject } from '~js/store/actions';
+import { refetchOrg } from '~js/store/orgs/actions';
+import { addUrlParams } from '~js/utils/api';
+import { SHOW_EPIC_COLLABORATORS } from '~js/utils/constants';
 
 import { renderWithRedux, storeWithThunk } from '../../utils';
 
-jest.mock('@/store/actions');
-jest.mock('@/store/orgs/actions');
+jest.mock('~js/store/actions');
+jest.mock('~js/store/orgs/actions');
 
 deleteObject.mockReturnValue(() =>
   Promise.resolve({ type: 'TEST', payload: {} }),
@@ -69,7 +69,7 @@ const defaultTask = {
   review_submitted_at: '2019-10-16T12:58:53.721Z',
   has_unmerged_commits: true,
 };
-const defaultProjectUsers = [
+const defaultEpicUsers = [
   { id: 'user-id', login: 'user-name' },
   { id: 'other-user', login: 'other-user' },
 ];
@@ -82,7 +82,7 @@ describe('<OrgCards/>', () => {
       initialState: defaultState,
       orgs: defaultOrgs,
       task: defaultTask,
-      projectUsers: defaultProjectUsers,
+      epicUsers: defaultEpicUsers,
       assignUserModalOpen: null,
       isCreatingOrg: ORG_TYPE_TRACKER_DEFAULT,
       testOrgReadyForReview: false,
@@ -97,8 +97,8 @@ describe('<OrgCards/>', () => {
           <OrgCards
             orgs={opts.orgs}
             task={opts.task}
-            projectUsers={opts.projectUsers}
-            projectUrl="project-url"
+            epicUsers={opts.epicUsers}
+            epicUrl="epic-url"
             assignUserModalOpen={opts.assignUserModalOpen}
             isCreatingOrg={opts.isCreatingOrg}
             testOrgReadyForReview={opts.testOrgReadyForReview}
@@ -238,22 +238,22 @@ describe('<OrgCards/>', () => {
       expect(data.should_alert_dev).toBe(true);
     });
 
-    test('redirects to project-detail if no users to assign', () => {
+    test('redirects to epic-detail if no users to assign', () => {
       const task = {
         ...defaultTask,
         assigned_dev: null,
       };
-      const projectUsers = [];
+      const epicUsers = [];
       const { getByText, context } = setup({
         task,
-        projectUsers,
+        epicUsers,
         assignUserModalOpen: 'Dev',
       });
-      fireEvent.click(getByText('View Project to Add Collaborators'));
+      fireEvent.click(getByText('View Epic to Add Collaborators'));
 
       expect(context.action).toEqual('PUSH');
       expect(context.url).toEqual(
-        addUrlParams('project-url', { [SHOW_PROJECT_COLLABORATORS]: true }),
+        addUrlParams('epic-url', { [SHOW_EPIC_COLLABORATORS]: true }),
       );
     });
   });
@@ -786,7 +786,7 @@ describe('<OrgCards/>', () => {
 
   describe('delete org click', () => {
     describe('QA org', () => {
-      test('deletes org', () => {
+      test('deletes org', async () => {
         const task = {
           ...defaultTask,
           assigned_qa: {
@@ -803,9 +803,12 @@ describe('<OrgCards/>', () => {
             has_unsaved_changes: false,
           },
         };
-        const { getByText } = setup({ orgs, task });
+        const { findByText, getByText } = setup({ orgs, task });
         fireEvent.click(getByText('Org Actions'));
         fireEvent.click(getByText('Delete Org'));
+
+        expect.assertions(3);
+        await findByText('Deleting Org…');
 
         expect(deleteObject).toHaveBeenCalledTimes(1);
 
@@ -813,13 +816,12 @@ describe('<OrgCards/>', () => {
 
         expect(args.objectType).toEqual('scratch_org');
         expect(args.object.id).toEqual('org-id');
-        expect(getByText('Deleting Org…')).toBeVisible();
       });
     });
 
     describe('Dev org', () => {
-      test('refreshes and then deletes org', () => {
-        const { getByText } = setup({
+      test('refreshes and then deletes org', async () => {
+        const { findByText, getByText } = setup({
           orgs: {
             ...defaultOrgs,
             Dev: {
@@ -833,6 +835,9 @@ describe('<OrgCards/>', () => {
         fireEvent.click(getByText('Org Actions'));
         fireEvent.click(getByText('Delete Org'));
 
+        expect.assertions(5);
+        await findByText('Deleting Org…');
+
         expect(refetchOrg).toHaveBeenCalledTimes(1);
 
         const refetchArgs = refetchOrg.mock.calls[0][0];
@@ -844,7 +849,6 @@ describe('<OrgCards/>', () => {
 
         expect(deleteArgs.objectType).toEqual('scratch_org');
         expect(deleteArgs.object.id).toEqual('org-id');
-        expect(getByText('Deleting Org…')).toBeVisible();
       });
 
       describe('org has changes', () => {
@@ -880,9 +884,12 @@ describe('<OrgCards/>', () => {
           });
 
           describe('"delete" click', () => {
-            test('deletes org', () => {
-              const { getByText, queryByText } = result;
+            test('deletes org', async () => {
+              const { findByText, getByText, queryByText } = result;
               fireEvent.click(getByText('Delete'));
+
+              expect.assertions(4);
+              await findByText('Deleting Org…');
 
               expect(
                 queryByText('Confirm Deleting Org With Unretrieved Changes'),
@@ -893,7 +900,6 @@ describe('<OrgCards/>', () => {
 
               expect(args.objectType).toEqual('scratch_org');
               expect(args.object.id).toEqual('org-id');
-              expect(getByText('Deleting Org…')).toBeVisible();
             });
           });
         });

@@ -7,16 +7,16 @@ import i18n from 'i18next';
 import React, { useRef, useState } from 'react';
 import { Trans } from 'react-i18next';
 
-import { GitHubUserAvatar } from '@/components/user/githubUser';
+import { GitHubUserAvatar } from '~js/components/user/githubUser';
 import {
   ExternalLink,
   LabelWithSpinner,
   useForm,
   useFormDefaults,
   useIsMounted,
-} from '@/components/utils';
-import { GitHubUser } from '@/store/user/reducer';
-import { OBJECT_TYPES, ObjectTypes } from '@/utils/constants';
+} from '~js/components/utils';
+import { GitHubUser } from '~js/store/user/reducer';
+import { OBJECT_TYPES, ObjectTypes } from '~js/utils/constants';
 
 interface Props {
   instanceId: string;
@@ -69,14 +69,14 @@ const SubmitModal = ({
       submittingLabel = i18n.t('Submitting Task for Testing…');
       toSubmitLabel = i18n.t('Submit Task for Testing');
       break;
-    case OBJECT_TYPES.PROJECT:
+    case OBJECT_TYPES.EPIC:
       objectType = {
-        objectType: OBJECT_TYPES.PROJECT_PR,
-        url: window.api_urls.project_create_pr(instanceId),
+        objectType: OBJECT_TYPES.EPIC_PR,
+        url: window.api_urls.epic_create_pr(instanceId),
       };
-      heading = i18n.t('Submit this project for review on GitHub');
-      submittingLabel = i18n.t('Submitting Project for Review on GitHub…');
-      toSubmitLabel = i18n.t('Submit Project for Review on GitHub');
+      heading = i18n.t('Submit this epic for review on GitHub');
+      submittingLabel = i18n.t('Submitting Epic for Review on GitHub…');
+      toSubmitLabel = i18n.t('Submit Epic for Review on GitHub');
       break;
   }
 

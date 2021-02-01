@@ -6,40 +6,40 @@ import i18n from 'i18next';
 import { omit } from 'lodash';
 import React, { useRef, useState } from 'react';
 
-import SelectFlowType from '@/components/tasks/selectFlowType';
+import SelectFlowType from '~js/components/tasks/selectFlowType';
 import {
   LabelWithSpinner,
   useForm,
   useFormDefaults,
   useIsMounted,
-} from '@/components/utils';
-import { OrgConfig, Project } from '@/store/projects/reducer';
-import { Task } from '@/store/tasks/reducer';
+} from '~js/components/utils';
+import { Epic, OrgConfig } from '~js/store/epics/reducer';
+import { Task } from '~js/store/tasks/reducer';
 import {
   DEFAULT_ORG_CONFIG_NAME,
   OBJECT_TYPES,
   ObjectTypes,
-} from '@/utils/constants';
+} from '~js/utils/constants';
 
 interface EditModalProps {
-  model: Project | Task;
+  model: Epic | Task;
   modelType: ObjectTypes;
   hasOrgs?: boolean;
-  projectId?: string;
+  epicId?: string;
   orgConfigsLoading?: boolean;
   orgConfigs?: OrgConfig[];
   isOpen: boolean;
   handleClose: () => void;
 }
 
-const isTask = (model: Project | Task, modelType: ObjectTypes): model is Task =>
+const isTask = (model: Epic | Task, modelType: ObjectTypes): model is Task =>
   modelType === OBJECT_TYPES.TASK;
 
 const EditModal = ({
   model,
   modelType,
   hasOrgs,
-  projectId,
+  epicId,
   orgConfigsLoading,
   orgConfigs,
   isOpen,
@@ -137,9 +137,9 @@ const EditModal = ({
       nameLabel = i18n.t('Task Name');
       heading = i18n.t('Edit Task');
       break;
-    case OBJECT_TYPES.PROJECT:
-      nameLabel = i18n.t('Project Name');
-      heading = i18n.t('Edit Project');
+    case OBJECT_TYPES.EPIC:
+      nameLabel = i18n.t('Epic Name');
+      heading = i18n.t('Edit Epic');
       break;
   }
 
@@ -198,7 +198,7 @@ const EditModal = ({
         {isTask(model, modelType) ? (
           <SelectFlowType
             orgConfigs={orgConfigs || []}
-            projectId={projectId}
+            epicId={epicId}
             value={inputs.org_config_name}
             errors={errors.org_config_name}
             isDisabled={hasOrgs}

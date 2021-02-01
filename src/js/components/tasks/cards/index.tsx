@@ -2,21 +2,21 @@ import i18n from 'i18next';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import OrgCard from '@/components/tasks/cards/card';
-import ConfirmDeleteModal from '@/components/tasks/confirmDeleteModal';
-import ConfirmRemoveUserModal from '@/components/tasks/confirmRemoveUserModal';
-import ConnectModal from '@/components/user/connect';
-import { ConnectionInfoModal } from '@/components/user/info';
-import { useIsMounted } from '@/components/utils';
-import { ThunkDispatch } from '@/store';
-import { deleteObject, updateObject } from '@/store/actions';
-import { refetchOrg } from '@/store/orgs/actions';
-import { Org, OrgsByTask } from '@/store/orgs/reducer';
-import { Task } from '@/store/tasks/reducer';
-import { GitHubUser, User } from '@/store/user/reducer';
-import { selectUserState } from '@/store/user/selectors';
-import apiFetch from '@/utils/api';
-import { OBJECT_TYPES, ORG_TYPES, OrgTypes } from '@/utils/constants';
+import OrgCard from '~js/components/tasks/cards/card';
+import ConfirmDeleteModal from '~js/components/tasks/confirmDeleteModal';
+import ConfirmRemoveUserModal from '~js/components/tasks/confirmRemoveUserModal';
+import ConnectModal from '~js/components/user/connect';
+import { ConnectionInfoModal } from '~js/components/user/info';
+import { useIsMounted } from '~js/components/utils';
+import { ThunkDispatch } from '~js/store';
+import { deleteObject, updateObject } from '~js/store/actions';
+import { refetchOrg } from '~js/store/orgs/actions';
+import { Org, OrgsByTask } from '~js/store/orgs/reducer';
+import { Task } from '~js/store/tasks/reducer';
+import { GitHubUser, User } from '~js/store/user/reducer';
+import { selectUserState } from '~js/store/user/selectors';
+import apiFetch from '~js/utils/api';
+import { OBJECT_TYPES, ORG_TYPES, OrgTypes } from '~js/utils/constants';
 
 export interface AssignedUserTracker {
   type: OrgTypes;
@@ -37,8 +37,8 @@ export const ORG_TYPE_TRACKER_DEFAULT = {
 const OrgCards = ({
   orgs,
   task,
-  projectUsers,
-  projectUrl,
+  epicUsers,
+  epicUrl,
   repoUrl,
   assignUserModalOpen,
   isCreatingOrg,
@@ -53,8 +53,8 @@ const OrgCards = ({
 }: {
   orgs: OrgsByTask;
   task: Task;
-  projectUsers: GitHubUser[];
-  projectUrl: string;
+  epicUsers: GitHubUser[];
+  epicUrl: string;
   repoUrl: string;
   assignUserModalOpen: OrgTypes | null;
   isCreatingOrg: OrgTypeTracker;
@@ -260,8 +260,8 @@ const OrgCards = ({
           type={ORG_TYPES.DEV}
           user={user}
           task={task}
-          projectUsers={projectUsers}
-          projectUrl={projectUrl}
+          epicUsers={epicUsers}
+          epicUrl={epicUrl}
           repoUrl={repoUrl}
           isCreatingOrg={isCreatingOrg[ORG_TYPES.DEV]}
           isDeletingOrg={isDeletingOrg[ORG_TYPES.DEV]}
@@ -279,8 +279,8 @@ const OrgCards = ({
           type={ORG_TYPES.QA}
           user={user}
           task={task}
-          projectUsers={projectUsers}
-          projectUrl={projectUrl}
+          epicUsers={epicUsers}
+          epicUrl={epicUrl}
           repoUrl={repoUrl}
           isCreatingOrg={isCreatingOrg[ORG_TYPES.QA]}
           isDeletingOrg={isDeletingOrg[ORG_TYPES.QA]}

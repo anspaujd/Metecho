@@ -4,34 +4,34 @@ import i18n from 'i18next';
 import React, { useCallback, useState } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 
-import { AssignedUserTracker } from '@/components/tasks/cards';
-import Footer from '@/components/tasks/cards/footer';
-import OrgActions from '@/components/tasks/cards/orgActions';
-import OrgIcon from '@/components/tasks/cards/orgIcon';
-import OrgInfo from '@/components/tasks/cards/orgInfo';
-import OrgSpinner from '@/components/tasks/cards/orgSpinner';
-import RefreshOrgModal from '@/components/tasks/cards/refresh';
-import UserActions from '@/components/tasks/cards/userActions';
-import { AssignUserModal, UserCard } from '@/components/user/githubUser';
-import { Org } from '@/store/orgs/reducer';
-import { Task } from '@/store/tasks/reducer';
-import { GitHubUser, User } from '@/store/user/reducer';
-import { addUrlParams } from '@/utils/api';
+import { AssignedUserTracker } from '~js/components/tasks/cards';
+import Footer from '~js/components/tasks/cards/footer';
+import OrgActions from '~js/components/tasks/cards/orgActions';
+import OrgIcon from '~js/components/tasks/cards/orgIcon';
+import OrgInfo from '~js/components/tasks/cards/orgInfo';
+import OrgSpinner from '~js/components/tasks/cards/orgSpinner';
+import RefreshOrgModal from '~js/components/tasks/cards/refresh';
+import UserActions from '~js/components/tasks/cards/userActions';
+import { AssignUserModal, UserCard } from '~js/components/user/githubUser';
+import { Org } from '~js/store/orgs/reducer';
+import { Task } from '~js/store/tasks/reducer';
+import { GitHubUser, User } from '~js/store/user/reducer';
+import { addUrlParams } from '~js/utils/api';
 import {
   ORG_TYPES,
   OrgTypes,
-  SHOW_PROJECT_COLLABORATORS,
-} from '@/utils/constants';
-import { getTaskCommits } from '@/utils/helpers';
-import { logError } from '@/utils/logging';
+  SHOW_EPIC_COLLABORATORS,
+} from '~js/utils/constants';
+import { getTaskCommits } from '~js/utils/helpers';
+import { logError } from '~js/utils/logging';
 
 interface OrgCardProps {
   org: Org | null;
   type: OrgTypes;
   user: User;
   task: Task;
-  projectUsers: GitHubUser[];
-  projectUrl: string;
+  epicUsers: GitHubUser[];
+  epicUrl: string;
   repoUrl: string;
   isCreatingOrg: boolean;
   isDeletingOrg: boolean;
@@ -58,8 +58,8 @@ const OrgCard = ({
   type,
   user,
   task,
-  projectUsers,
-  projectUrl,
+  epicUsers,
+  epicUrl,
   repoUrl,
   isCreatingOrg,
   isDeletingOrg,
@@ -143,10 +143,8 @@ const OrgCard = ({
   }, [handleCheckForOrgChanges, org]);
 
   const handleEmptyMessageClick = useCallback(() => {
-    history.push(
-      addUrlParams(projectUrl, { [SHOW_PROJECT_COLLABORATORS]: true }),
-    );
-  }, [projectUrl]); // eslint-disable-line react-hooks/exhaustive-deps
+    history.push(addUrlParams(epicUrl, { [SHOW_EPIC_COLLABORATORS]: true }));
+  }, [epicUrl]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const taskCommits = getTaskCommits(task);
   const orgCommitIdx = org ? taskCommits.indexOf(org.latest_commit) : -1;
@@ -266,11 +264,11 @@ const OrgCard = ({
         )}
       </Card>
       <AssignUserModal
-        allUsers={projectUsers}
+        allUsers={epicUsers}
         selectedUser={assignedUser}
         orgType={type}
         isOpen={assignUserModalOpen === type}
-        emptyMessageText={i18n.t('View Project to Add Collaborators')}
+        emptyMessageText={i18n.t('View Epic to Add Collaborators')}
         emptyMessageAction={handleEmptyMessageClick}
         onRequestClose={closeAssignUserModal}
         setUser={doAssignUser}
